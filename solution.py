@@ -77,6 +77,8 @@ boxes = cross(rows, cols)
 row_units = [cross(r, cols) for r in rows]
 column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
+
+# Add 2 new units one for each diagonal
 diag_units = []
 d1 = []
 d2 = []
@@ -87,6 +89,7 @@ diag_units.append(d1)
 diag_units.append(d2)
 
 #unitlist = row_units + column_units + square_units
+# + the new diag_units as well to solve a the diagonal sudoku
 unitlist = row_units + column_units + square_units + diag_units
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
