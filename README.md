@@ -3,11 +3,14 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
+A: because if 2 boxes in the same unit have the same 2 digits as possible solutions, only these 2 boxes
+can have them, so we know these 2 digits can be removed from all other boxes in that unit.  This significanly
+reduces the number of potential search digits that have to be checked later.
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: Really the same way the other constraint propagation rules (only_choice, naked_twins) are used for all
+the other units.   We just add 2 new additional 'units' to check.
 
 ### Install
 
