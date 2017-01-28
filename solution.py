@@ -68,6 +68,57 @@ def naked_twins(values):
                                 assign_value(values,box, values[box].replace(d,''))
     return values
 
+def closed_chain_trip(values):
+    """Eliminate values using the 3 square chain permutation rule strategy.
+    Args:
+        values(dict): a dictionary of the form {'box_name': '123456789', ...}
+
+    Returns:
+        the values dictionary with the 3 square permutaions eliminated from peers.
+    """
+
+    # Find all instances of 3 squares that only have 2 solutions each that are in common with each other
+    # such that the 3 resulting possible solutions are unique to these 3 squares
+    # Eliminate the 3 unique possibilities for their peers
+
+    # check each unit, find any values that are of length 2, these are potential candidates
+    for unit in unitlist:
+        two_values = [box for box in unit if len(values[box]) == 2]
+        processed = []
+        for two_value in two_values:
+            # for each 2 digit value found, find its twins.
+            # save off any twins found so we don't double process it
+            if two_value in processed:
+                continue
+            cands = set()
+            candvals = set(values[two_value])
+            d21=values[two_value][0]
+            d22=values[two_value][1]
+            for box in unit:
+                if box == two_value or len(values[box]) != 2 or values[box] == values[two_value]:
+                    continue
+                if d21 in values[box]:
+                    cands.add(box)
+                    for d in values[box]:
+                        candvals.add(d)
+                if d22 in values[box]:
+                    cands.add(box)
+                    for d in values[box]:
+                        candvals.add(d)
+            if len(cands) == 3:
+                processed.append(cands)
+                cands.add(two_value)
+                unitpeers = set(unit) - cands
+                for peer in unitpeers:
+                # now for each other box in this unit, find the 'non-twins'
+                    # and for each non-twin, remove any digits in it that are in the current
+                    # 2 digit value, because only the current value and its twin can contain
+                    # these 2 digits.
+                    for d in candvals:
+                        if d in values[peer]:
+                            assign_value(values,peer, values[peer].replace(d,''))
+    return values
+
 def cross(A, B):
     "Cross product of elements in A and elements in B."
     return [s+t for s in A for t in B]
@@ -159,6 +210,7 @@ def reduce_puzzle(values):
         values = eliminate(values)
         values = only_choice(values)
         values = naked_twins(values)
+        values = closed_chain_trip(values)
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
         stalled = solved_values_before == solved_values_after
         if len([box for box in values.keys() if len(values[box]) == 0]):
@@ -193,12 +245,21 @@ def solve(grid):
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
     values=grid_values(grid)
+#    display(values)
     values=search(values)
     return values
 
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    display(solve(diag_sudoku_grid))
+# medium complex puzzle, does not solve with diagonal units in play
+#     diag_sudoku_grid = '.9.6.1.......3.9.1.3.2.8...7.9.....4.4.3.7.9.8.3.1.5.7.5.7.2.1.9.4.5.7.6.1.9.6.58'
+# 'evil' puzzle, does not solve with diagonal units in play
+#    diag_sudoku_grid = '...............523.......18...........9.74.6...461...7.58.43....4..2..3..67.81.94'
+    sol=solve(diag_sudoku_grid)
+    if sol:
+        display(sol)
+    else:
+        print("Failed to solve puzzle")
 
     try:
         from visualize import visualize_assignments
